@@ -5,41 +5,77 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-public class MainPanel extends JFrame {
+public class MainPanel extends JPanel {
     public ArrayList<Dot> dots = new ArrayList<>();
     public static MainPanel MainFrame;
+    public static CustomListener listener;
+
+    public boolean is_create_dot(String data){
+        for(int i = 0; i < dots.size();i++){
+            if(dots.get(i).data.equals(data)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void search_deep(){
+        ArrayList<Dot> dots = MainFrame.dots;
+        for(int i = 0; i < dots.size();i++){
+            Dot dot = dots.get(i);
+            dot.setColor(Color.blue);
+        }
+    }
+
+
+    public Dot not_checked(ArrayList<Edge> edges,ArrayList<Dot> dots){
+        for(int i = 0; i < edges.size();i++){
+            Dot root = edges.get(i).root;
+            Dot child = edges.get(i).child;
+            for(int j = 0; j < dots.size();i++){
+                if(root != dots.get(j)){
+                    return root;
+                }
+            }
+        }
+        return null;
+    }
+
 
     MainPanel(){
-        super("Графы");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        super();
+        new Thread().start();
         setBackground(Color.WHITE);
         MainFrame = this;
-        addMouseListener(new CustomListener());
+        listener = new CustomListener();
+        addMouseListener(listener);
         setSize(600,600);
         setLayout(null);
         setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new MainPanel();
-    }
-
-
     public class TempFrame extends JFrame {
         TempFrame(int x,int y){
             super("Введите значение точки");
             setSize(200,100);
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            JFrame context = (JFrame) this;
             JTextField input = new JTextField(5);
             input.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    boolean is_create = is_create_dot(input.getText());
                     dispose();
-                    Dot dot = new Dot(input.getText());
-                    dots.add(dot);
-                    dot.setBounds(x-30,y-50,43,43);
-                    MainFrame.add(dot);
-                    MainFrame.repaint();
+                    if(!is_create) {
+                        Dot dot = new Dot(input.getText());
+                        dots.add(dot);
+                        dot.setBounds(x - 20, y - 20, 43, 43);
+                        MainFrame.add(dot);
+                        MainFrame.repaint();
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(context, "Вершина уже создана");
+                    }
                 }
             });
             input.setBounds(25,25,100,25);
@@ -50,8 +86,8 @@ public class MainPanel extends JFrame {
 
     }
 
-    public class CustomListener implements MouseListener{
 
+    public class CustomListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e) {
             new TempFrame(e.getX(),e.getY());
@@ -76,4 +112,5 @@ public class MainPanel extends JFrame {
 
         }
     }
+
 }

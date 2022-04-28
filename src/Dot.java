@@ -2,35 +2,55 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.util.ArrayList;
 
-public class Dot extends JComponent {
+public class Dot extends JComponent{
     String data;
     static boolean connection = false;
     static Dot root = null;
+    private volatile int draggedAtX, draggedAtY;
+    private ArrayList<Line> lines_root = new ArrayList<>();
+    private ArrayList<Line> lines_child = new ArrayList<>();
+
     Color color = Color.GREEN;
     CustomListenet listenet = new CustomListenet();
     Dot(String data){
         this.data = data;
+        addMouseMotionListener(new MouseMotionAdapter(){
+            public void mouseDragged(MouseEvent e){
+                for (int i = 0; i < lines_child.size(); i++) {
+                    Line line = lines_child.get(i);
+                    line.x1 = e.getX() - draggedAtX + getLocation().x + 20;
+                    line.y1 = e.getY() - draggedAtY + getLocation().y + 20;
+                    lines_child.get(i).repaint();
+                }
+                for (int i = 0; i < lines_root.size(); i++) {
+                    Line line = lines_root.get(i);
+                    line.x = e.getX() - draggedAtX + getLocation().x + 20;
+                    line.y = e.getY() - draggedAtY + getLocation().y + 20;
+                    lines_root.get(i).repaint();
+                }
+                setLocation(e.getX() - draggedAtX + getLocation().x,
+                        e.getY() - draggedAtY + getLocation().y);;
+            }
+        });
     }
 
-    Dot(int data){
-        this.data = Integer.toString(data);
+    public void setColor(Color color){
+        this.color = color;
+        repaint();
     }
-
     @Override
     public void paint(Graphics g) {
         removeMouseListener(listenet);
         addMouseListener(listenet);
         super.paint(g);
         g.setColor(color);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setStroke(new BasicStroke(3));
         g.fillOval(1, 1, 40, 40);
-        g2.setColor(Color.black);
+        g.setColor(Color.black);
         g.drawString(data,13,25);
     }
-
-
 
     public class CustomListenet implements MouseListener{
         @Override
@@ -54,6 +74,8 @@ public class Dot extends JComponent {
                 if(child != root && root != null && !Edge.is_connected(root,child)){
                     new Edge(root,child);
                     Line line = new Line(root,child);
+                    child.lines_child.add(line);
+                    root.lines_root.add(line);
                     MainPanel.MainFrame.add(line);
                     line.setBounds(0,0,600,600);
                     MainPanel.MainFrame.repaint();
@@ -68,22 +90,34 @@ public class Dot extends JComponent {
 
         @Override
         public void mousePressed(MouseEvent e) {
-
+            draggedAtX = e.getX();
+            draggedAtY = e.getY();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-
+            Dot dot = (Dot)e.getSource();
+            dot.setColor(Color.CYAN);
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-
+            Dot dot = (Dot) e.getSource();
+            if(connection){
+                if(dot != root) {
+                    dot.setColor(Color.GREEN);
+                }
+                else{
+                    dot.setColor(Color.orange);
+                }
+            }
+            else {
+                dot.setColor(Color.green);
+            }
         }
     }
 }
