@@ -22,25 +22,8 @@ public class MainPanel extends JPanel {
     }
 
     public void search_deep(){
-        ArrayList<Dot> dots = MainFrame.dots;
-        for(int i = 0; i < dots.size();i++){
-            Dot dot = dots.get(i);
-            dot.setColor(Color.blue);
-        }
-    }
-
-
-    public Dot not_checked(ArrayList<Edge> edges,ArrayList<Dot> dots){
-        for(int i = 0; i < edges.size();i++){
-            Dot root = edges.get(i).root;
-            Dot child = edges.get(i).child;
-            for(int j = 0; j < dots.size();i++){
-                if(root != dots.get(j)){
-                    return root;
-                }
-            }
-        }
-        return null;
+        Thread t = new Thread(new SearchDeep(dots,Edge.edges,"22"));
+        t.start();
     }
 
 

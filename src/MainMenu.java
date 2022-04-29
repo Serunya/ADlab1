@@ -41,6 +41,7 @@ public class MainMenu extends JFrame {
     class ListenerAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            MainPanel.MainFrame.search_deep();
         }
 
     }
