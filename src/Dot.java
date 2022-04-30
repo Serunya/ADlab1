@@ -10,11 +10,12 @@ public class Dot extends JComponent{
     static boolean connection = false;
     static Dot root = null;
     private volatile int draggedAtX, draggedAtY;
-    private ArrayList<Line> lines_root = new ArrayList<>();
-    private ArrayList<Line> lines_child = new ArrayList<>();
+    public ArrayList<Line> lines_root = new ArrayList<>();
+    public ArrayList<Line> lines_child = new ArrayList<>();
 
     Color color = Color.GREEN;
     CustomListenet listenet = new CustomListenet();
+
     Dot(String data){
         this.data = data;
         addMouseMotionListener(new MouseMotionAdapter(){

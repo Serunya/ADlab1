@@ -7,10 +7,17 @@ public class SearchDeep implements Runnable {
     ArrayList<Edge> edges;
     String search_item;
 
+    public void all_green(ArrayList<Dot> dots){
+        for(int i = 0; i < dots.size(); i++){
+            dots.get(i).setColor(Color.green);
+        }
+    }
+
     SearchDeep(ArrayList<Dot> dots, ArrayList<Edge> edges, String search_item) {
         this.search_item = search_item;
         this.dots = dots;
         this.edges = edges;
+        all_green(dots);
     }
 
     public ArrayList<Dot> get_all_child(Dot root) {
@@ -62,36 +69,44 @@ public class SearchDeep implements Runnable {
             Dot prev = dots.get(0);
             /// Листы
             ArrayList<Dot> cheked_dots = new ArrayList<>();
+            ArrayList<Dot> history = new ArrayList<>();
+            ///
             cheked_dots.add(head);
             ArrayList<Dot> childs;
+            /// Красота
             temp.setColor(Color.blue);
             Thread.sleep(500);
             temp.setColor(Color.green);
+            /// Сам алгоритм
             do {
+                history.add(temp);
                 childs = get_all_child(temp);
-                cheked_dots.add(prev);
                 Dot next_child = not_cheked_child(childs,cheked_dots);
-                cheked_dots.remove(prev);
+
+                //Против циклов
+                if(history.contains(next_child)){
+                    history.addAll(cheked_dots);
+                    next_child = not_cheked_child(childs,history);
+                }
+                // Проверка элемента на нахождение
                 if(temp.data.equals(search_item)){
                     temp.setColor(Color.magenta);
                     break;
                 }
-
+                // Если все элементы проверенны
                 if(temp == head && next_child == null){
                     steps = -1;
                     break;
                 }
-
+                // Возвращение в голову
                 if(next_child == null){
-                    prev = head;
                     cheked_dots.add(temp);
                     temp.setColor(Color.pink);
                     temp = head;
                     steps = 0;
+                    history.clear();
                 }
-
                 else{
-                    prev = temp;
                     temp = next_child;
                 }
                 temp.setColor(Color.blue);
