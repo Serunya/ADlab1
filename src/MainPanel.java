@@ -37,7 +37,7 @@ public class MainPanel extends JFrame {
                     dispose();
                     Dot dot = new Dot(input.getText());
                     dots.add(dot);
-                    dot.setBounds(x-30,y-50,43,43);
+                    dot.setBounds(x-30,y-50,63,63);
                     MainFrame.add(dot);
                     MainFrame.repaint();
                 }

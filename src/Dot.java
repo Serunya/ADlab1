@@ -25,9 +25,9 @@ public class Dot extends JComponent {
         g.setColor(color);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(3));
-        g.fillOval(1, 1, 40, 40);
+        g.fillOval(20, 20, 40, 40);
         g2.setColor(Color.black);
-        g.drawString(data,13,25);
+        g.drawString(data,33,45);
     }
 
 
