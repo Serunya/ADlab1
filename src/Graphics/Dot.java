@@ -1,3 +1,5 @@
+package Graphics;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -6,7 +8,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 public class Dot extends JComponent{
-    String data;
+    public int data;
     static boolean connection = false;
     static Dot root = null;
     private volatile int draggedAtX, draggedAtY;
@@ -14,9 +16,9 @@ public class Dot extends JComponent{
     public ArrayList<Line> lines_child = new ArrayList<>();
 
     Color color = Color.GREEN;
-    CustomListenet listenet = new CustomListenet();
+    public CustomListenet listenet = new CustomListenet();
 
-    Dot(String data){
+    public Dot(int data){
         this.data = data;
         addMouseMotionListener(new MouseMotionAdapter(){
             public void mouseDragged(MouseEvent e){
@@ -50,43 +52,70 @@ public class Dot extends JComponent{
         g.setColor(color);
         g.fillOval(1, 1, 40, 40);
         g.setColor(Color.black);
-        g.drawString(data,13,25);
+        g.drawString(Integer.toString(data),13,25);
     }
 
     public class CustomListenet implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e) {
-            if(!connection){
-                if(root != (Dot) e.getSource()) {
-                    root = (Dot) e.getSource();
-                    color = Color.ORANGE;
-                    repaint();
-                }
-                else{
-                    if(root != null){
-                        root.color = Color.green;
-                        root.repaint();
-                        root = null;
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                if (!connection) {
+                    if (root != (Dot) e.getSource()) {
+                        root = (Dot) e.getSource();
+                        color = Color.ORANGE;
+                        repaint();
+                    } else {
+                        if (root != null) {
+                            root.color = Color.green;
+                            root.repaint();
+                            root = null;
+                        }
                     }
+                } else {
+                    Dot child = (Dot) e.getSource();
+                    if (child != root && root != null && !Edge.is_connected(root, child)) {
+                        int weight;
+                        String inp = JOptionPane.showInputDialog("Введите вес линии");
+                        if (inp == "") {
+                            weight = 1;
+                        } else {
+                            weight = Integer.parseInt(inp);
+                        }
+                        Line line = new Line(root, child, weight);
+                        new Edge(root, child, line, weight);
+                        child.lines_child.add(line);
+                        root.lines_root.add(line);
+                        MainPanel.MainFrame.add(line);
+                        line.setBounds(0, 0, 600, 600);
+                    /*
+                    if(MainPanel.neograph){
+                        line = new Line(child,root,weight);
+                        new Edge(child,root,line,weight);
+                        child.lines_child.add(line);
+                        root.lines_root.add(line);
+                        MainPanel.MainFrame.add(line);
+                        line.setBounds(0,0,600,600);
+                    }
+                     */
+                        MainPanel.MainFrame.repaint();
+                    }
+                    root.color = Color.green;
+                    root.repaint();
+                    repaint();
+                    root = null;
                 }
+                connection = !connection;
             }
-            else{
-                Dot child = (Dot)e.getSource();
-                if(child != root && root != null && !Edge.is_connected(root,child)){
-                    new Edge(root,child);
-                    Line line = new Line(root,child);
-                    child.lines_child.add(line);
-                    root.lines_root.add(line);
-                    MainPanel.MainFrame.add(line);
-                    line.setBounds(0,0,600,600);
-                    MainPanel.MainFrame.repaint();
+            if(e.getButton() == MouseEvent.BUTTON3){
+                Dot dot = (Dot)e.getSource();
+                for(int i = 0; i < dot.lines_child.size();i++){
+                    MainPanel.MainFrame.remove(dot.lines_child.get(i));
+                    Edge.get_edges_from_line(dot.lines_child.get(i));
+                    dot.lines_child.remove(i);
                 }
-                root.color = Color.green;
-                root.repaint();
                 repaint();
-                root = null;
+                MainPanel.MainFrame.repaint();
             }
-            connection = !connection;
         }
 
         @Override

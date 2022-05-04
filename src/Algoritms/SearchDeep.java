@@ -1,11 +1,14 @@
+package Algoritms;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import Graphics.Dot;
+import Graphics.Edge;
 
 public class SearchDeep implements Runnable {
     ArrayList<Dot> dots;
     ArrayList<Edge> edges;
-    String search_item;
+    int search_item;
 
     public void all_green(ArrayList<Dot> dots){
         for(int i = 0; i < dots.size(); i++){
@@ -13,7 +16,7 @@ public class SearchDeep implements Runnable {
         }
     }
 
-    SearchDeep(ArrayList<Dot> dots, ArrayList<Edge> edges, String search_item) {
+    public SearchDeep(ArrayList<Dot> dots, ArrayList<Edge> edges, int search_item) {
         this.search_item = search_item;
         this.dots = dots;
         this.edges = edges;
@@ -31,7 +34,7 @@ public class SearchDeep implements Runnable {
         return all_child;
     }
 
-    public Boolean isConnected(Dot root,Dot child){
+    public Boolean isConnected(Dot root, Dot child){
         for(int i = 0;i < edges.size();i++){
             if(edges.get(i).root == root & edges.get(i).child == child){
                 return true;
@@ -66,7 +69,6 @@ public class SearchDeep implements Runnable {
             /// Вершины
             Dot head = dots.get(0);
             Dot temp = dots.get(0);
-            Dot prev = dots.get(0);
             /// Листы
             ArrayList<Dot> cheked_dots = new ArrayList<>();
             ArrayList<Dot> history = new ArrayList<>();
@@ -82,14 +84,13 @@ public class SearchDeep implements Runnable {
                 history.add(temp);
                 childs = get_all_child(temp);
                 Dot next_child = not_cheked_child(childs,cheked_dots);
-
                 //Против циклов
                 if(history.contains(next_child)){
                     history.addAll(cheked_dots);
                     next_child = not_cheked_child(childs,history);
                 }
                 // Проверка элемента на нахождение
-                if(temp.data.equals(search_item)){
+                if(temp.data == search_item){
                     temp.setColor(Color.magenta);
                     break;
                 }
@@ -98,7 +99,7 @@ public class SearchDeep implements Runnable {
                     steps = -1;
                     break;
                 }
-                // Возвращение в голову
+                // Возвращение назад
                 if(next_child == null){
                     cheked_dots.add(temp);
                     temp.setColor(Color.pink);
