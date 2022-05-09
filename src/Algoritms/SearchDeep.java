@@ -43,14 +43,8 @@ public class SearchDeep implements Runnable {
         return false;
     }
 
-    public void out(ArrayList<Dot> arr){
-        for(int i = 0;i < arr.size();i++){
-            System.out.print(arr.get(i).data + " ");
-        }
-        System.out.println();
-    }
-
-    public Dot not_cheked_child(ArrayList<Dot> childs, ArrayList<Dot> cheked_dots) {
+    public Dot not_cheked_child(Dot root, ArrayList<Dot> cheked_dots) {
+        ArrayList<Dot> childs = get_all_child(root);
         if(cheked_dots.size() == 0 && childs.size() != 0){
             return childs.get(0);
         }
@@ -72,6 +66,12 @@ public class SearchDeep implements Runnable {
             /// Листы
             ArrayList<Dot> cheked_dots = new ArrayList<>();
             ArrayList<Dot> history = new ArrayList<>();
+            // list for dream
+            ArrayList<int[]> UT = new ArrayList<int[]>();
+            ArrayList<int[]> UB = new ArrayList<int[]>();
+            ArrayList<int[]> UF = new ArrayList<int[]>();
+            ArrayList<int[]> UC = new ArrayList<int[]>();
+
             ///
             cheked_dots.add(head);
             ArrayList<Dot> childs;
@@ -82,12 +82,12 @@ public class SearchDeep implements Runnable {
             /// Сам алгоритм
             do {
                 history.add(temp);
-                childs = get_all_child(temp);
-                Dot next_child = not_cheked_child(childs,cheked_dots);
+                Dot next_child = not_cheked_child(temp,cheked_dots);
                 //Против циклов
                 if(history.contains(next_child)){
                     history.addAll(cheked_dots);
-                    next_child = not_cheked_child(childs,history);
+                    next_child = not_cheked_child(temp,history);
+                    history.removeAll(cheked_dots);
                 }
                 // Проверка элемента на нахождение
                 if(temp.data == search_item){
@@ -101,13 +101,21 @@ public class SearchDeep implements Runnable {
                 }
                 // Возвращение назад
                 if(next_child == null){
-                    cheked_dots.add(temp);
-                    temp.setColor(Color.pink);
-                    temp = head;
-                    steps = 0;
-                    history.clear();
+                    if(isConnected(temp,history.get(history.size()-2))){
+                        temp.setColor(Color.pink);
+                        temp = history.get(history.size()-2);
+                        steps -= 2;
+                    }
+                    else {
+                        cheked_dots.add(temp);
+                        temp.setColor(Color.pink);
+                        temp = head;
+                        steps = 0;
+                        history.clear();
+                    }
                 }
                 else{
+                    UT.add(new int[]{temp.data,next_child.data});
                     temp = next_child;
                 }
                 temp.setColor(Color.blue);
@@ -116,7 +124,6 @@ public class SearchDeep implements Runnable {
                 steps += 1;
             } while (true);
             System.out.println("Количество шагов: " + steps);
-
         } catch(InterruptedException e){
             e.printStackTrace();
         }

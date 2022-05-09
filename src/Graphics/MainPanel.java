@@ -20,9 +20,12 @@ public class MainPanel extends JPanel {
     }
 
     public void search_deep(){
+        Thread t = new Thread(new SearchDeep2(dots,Edge.edges,0));
+        /*
         String search_item = null;
         search_item = JOptionPane.showInputDialog("Введи значение искомого элемента");
         Thread t = new Thread(new SearchDeep(dots,Edge.edges,Integer.parseInt(search_item)));
+        */
         t.start();
     }
 

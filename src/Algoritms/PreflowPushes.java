@@ -14,11 +14,12 @@ public class PreflowPushes implements Runnable{
     int[][] f;
     int[] e;
     final int INF = Integer.MAX_VALUE;
+
+
     public PreflowPushes(ArrayList<Dot> dots, ArrayList<Edge> edges){
         this.dots = dots;
         this.edges = edges;
         h = new int[dots.size()];
-        h[0] = dots.size();
         for(int i = 0;i < dots.size();i++){
             h[i] = 0;
         }
@@ -30,13 +31,13 @@ public class PreflowPushes implements Runnable{
                 return edges.get(i).weight;
             }
         }
-        return INF;
+        return 0;
     }
 
     public void push(int u, int v){
         int d = min(e[u], c(u,v) - f[u][v]);
         f[u][v] += d;
-        f[v][u] = - f[u][v];
+        f[v][u] = -1 * f[u][v];
         e[u] -= d;
         e[v] += d;
     }
@@ -53,16 +54,17 @@ public class PreflowPushes implements Runnable{
 
     @Override
     public void run() {
-        f = new int[dots.size()][dots.size()];
-        for(int i = 0; i < dots.size();i++){
+        int n = dots.size();
+        f = new int[n][n];
+        for(int i = 1; i < dots.size();i++){
             f[0][i] = c(0,i);
             f[i][0] = -1 * c(0,i);
         }
-        e = new int[dots.size()];
-        for(int i = 0; i < dots.size();i++){
+        e = new int[n];
+        h[0] = n;
+        for(int i = 1; i < dots.size();i++){
             e[i] = f[0][i];
         }
-        int n = dots.size();
         for(;;){
             int i;
             for (i=1; i<n-1; i++)
@@ -70,7 +72,6 @@ public class PreflowPushes implements Runnable{
                     break;
             if (i == n-1)
                 break;
-
             int j;
             for (j=0; j<n; j++)
                 if (c(i,j)-f[i][j] > 0 && h[i]==h[j]+1)
