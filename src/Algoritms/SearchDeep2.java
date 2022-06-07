@@ -1,13 +1,14 @@
 package Algoritms;
 
+import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-public class SearchDeep2 implements Runnable{
-    private final int r;
+public class SearchDeep2 extends Algoritm{
+    private final int r = -1;
     private ArrayList<Dot> dots;
     private ArrayList<Edge> edges;
 
@@ -25,14 +26,8 @@ public class SearchDeep2 implements Runnable{
     ArrayList<int[]> UF = new ArrayList<>();
     ArrayList<int[]> UC = new ArrayList<>();
     //
-    public SearchDeep2(ArrayList<Dot> dots, ArrayList<Edge> edges, int r){
-        this.dots = dots;
-        this.edges = edges;
-        this.r = r;
-        matrix = get_matrix();
-        num = new int[dots.size()];
-        ftr = new int[dots.size()];
-        tk = new int[dots.size()];
+    public SearchDeep2(){
+        super("Поиск в глубину 2");
     }
 
     public Dot get_dot(int data){
@@ -64,7 +59,13 @@ public class SearchDeep2 implements Runnable{
     }
 
     @Override
-    public void run() {
+    public void algoritm() {
+        this.dots = DataMapper.getDots();
+        this.edges = DataMapper.getEdges();
+        matrix = get_matrix();
+        num = new int[dots.size()];
+        ftr = new int[dots.size()];
+        tk = new int[dots.size()];
         for(int i = 0; i < matrix.length;i++){
             num[i] = 0;
             ftr[i] = 0;
@@ -74,7 +75,11 @@ public class SearchDeep2 implements Runnable{
             c++;
             if(num[i] == 0) {
                 try {
+                    Dot dot = get_dot(r);
+                    dot.setColor(Color.blue);
+                    Thread.sleep(500);
                     SDK(r);
+                    dot.setColor(Color.pink);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -110,17 +115,21 @@ public class SearchDeep2 implements Runnable{
         c++;
         num[i] = k;
         k++;
-        Dot dot = get_dot(i);
-        dot.setColor(Color.blue);
-        Thread.sleep(500);
         for(int j:matrix[i]){
-            dot.setColor(Color.GREEN);
             if(num[j] == 0) {
+                Dot dot = get_dot(j);
+                dot.setColor(Color.blue);
+                Thread.sleep(500);
                 ftr[j] = i;
                 UT.add(new int[]{i, j});
                 SDK(j);
+                dot.setColor(Color.pink);
+                Thread.sleep(500);
             }
             else {
+                if (num[j]<num[i] && ftr[i] != j)
+                    UB.add(new int[]{i,j});
+               /* удалить
                if(num[j] > num[i]){
                    UF.add(new int[]{i,j});
                }
@@ -130,11 +139,9 @@ public class SearchDeep2 implements Runnable{
                    else
                        UC.add(new int[]{i,j});
                }
+               */
             }
         }
-        dot = get_dot(i);
-        dot.setColor(Color.pink);
-        Thread.sleep(500);
         tk[i] = k;
     }
 }

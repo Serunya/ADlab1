@@ -1,29 +1,19 @@
 package Algoritms;
 
+import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
-import Graphics.Line;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class FordBelman implements Runnable{
-    ArrayList<Edge> edges = new ArrayList<>();
-    ArrayList<Dot> dots = new ArrayList<>();
+public class FordBelman extends Algoritm {
     ArrayList<Double> labels = new ArrayList<>();
     double[] dist;
 
-    public FordBelman(ArrayList<Dot> dots, ArrayList<Edge> edges, Dot src){
-        this.edges.addAll(edges);
-        this.dots.addAll(dots);
-        dist = new double[dots.size()];
-        dist[0] = 0;
-        dots.set(dots.indexOf(src), dots.get(0));
-        dots.set(0,src);
-        for(int i = 1; i < dist.length; i++){
-            dist[i] = Double.MAX_VALUE;
-        }
+    public FordBelman(){
+        super("Форд-Белман");
     }
 
     public double get_weight(int a, int b){
@@ -50,13 +40,24 @@ public class FordBelman implements Runnable{
     }
 
     @Override
-    public void run() {
-        for(int k = 1;k <= dots.size() - 1;k++){
-            for(int i = 0;i < dots.size();i++){
-                for(int j = 0; j < dots.size();j++){
-                    labels.add(dist[j] + get_weight(j,i));
+    public void algoritm() {
+        dist = new double[dots.size()];
+        dist[0] = 0;
+        for(int i = 1; i < dist.length; i++){
+            dist[i] = Double.MAX_VALUE;
+        }
+        for(int i = 1; i < dots.size();i++){
+            for(Edge v: edges){
+                if( dist[v.child.data] > dist[v.root.data] + v.weight)
+                    dist[v.child.data] = dist[v.root.data] + v.weight;
+            }
+        }
+
+        for(int k = 1;k < dots.size();k++) {
+            for (int i = 0; i < dots.size(); i++) {
+                for (int j = 0; j < dots.size(); j++) {
+                    labels.add(dist[j] + get_weight(j, i));
                 }
-                System.out.println();
                 dist[i] = minOfArrayList(labels);
                 labels.clear();
             }
@@ -78,7 +79,7 @@ public class FordBelman implements Runnable{
             dots.set(0,dot);
             dot.setBounds(250,230,43,43);
             add(dot);
-            dot.listenet = null;
+            dot.removeMouseListener(dot.listenet);
             int R = 25 * dist.length-1;
             for(int i = 1;i < dist.length;i++){
                 double ang = 2*3.1416*(i)/dist.length -2 ;
@@ -87,18 +88,18 @@ public class FordBelman implements Runnable{
                 dot = new Dot(dots.get(i).data);
                 add(dot);
                 dots.set(i,dot);
-                dot.listenet = null;
+                dot.removeMouseListener(dot.listenet);
                 dot.setBounds(x,y,43,43);
             }
 
             for(int i = 1; i < dist.length;i++) {
-                Line line;
+                Edge edge;
                 if(res[i] == Double.MAX_VALUE)
-                    line = new Line(dots.get(0), dots.get(i), "∞");
+                    edge = new Edge(dots.get(0), dots.get(i), "∞");
                 else
-                    line = new Line(dots.get(0),dots.get(i), res[i]);
-                line.setBounds(0, 0, 600, 600);
-                add(line);
+                    edge = new Edge(dots.get(0),dots.get(i), res[i]);
+                edge.getLine().setBounds(0, 0, 600, 600);
+                add(edge.getLine());
             }
         }
     }

@@ -1,5 +1,6 @@
 package Algoritms;
 
+import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 
 import static java.lang.Math.min;
 
-public class PreflowPushes implements Runnable{
+public class PreflowPushes extends Algoritm{
     ArrayList<Dot> dots;
     ArrayList<Edge> edges;
     int[] h;
@@ -16,13 +17,8 @@ public class PreflowPushes implements Runnable{
     final int INF = Integer.MAX_VALUE;
 
 
-    public PreflowPushes(ArrayList<Dot> dots, ArrayList<Edge> edges){
-        this.dots = dots;
-        this.edges = edges;
-        h = new int[dots.size()];
-        for(int i = 0;i < dots.size();i++){
-            h[i] = 0;
-        }
+    public PreflowPushes(){
+        super("Проталкивание предпотока");
     }
 
     public int c(int a,int b){
@@ -53,7 +49,11 @@ public class PreflowPushes implements Runnable{
     }
 
     @Override
-    public void run() {
+    public void algoritm() {
+        h = new int[dots.size()];
+        for(int i = 0;i < dots.size();i++){
+            h[i] = 0;
+        }
         int n = dots.size();
         f = new int[n][n];
         for(int i = 1; i < dots.size();i++){
@@ -83,8 +83,21 @@ public class PreflowPushes implements Runnable{
         }
         int flow = 0;
         for (int i=0; i<n; i++)
-            if (c(0,i) != INF)
+            if (c(0,i) != INF) {
                 flow += f[0][i];
+            }
+
+        for(int i = 0; i < f.length; i++){
+            System.out.println(i + ": ");
+            for(int j = 0; j < f.length;j++){
+                if(c(i,j) > 0 && c(i,j) != INF){
+                    System.out.println("\t" + (j + 1) + ": " + Math.abs(f[i][j]));
+                    Edge v = DataMapper.get_edge(i,j);
+                    v.line.setText(v.weight + "/" + Math.abs(f[i][j]));
+                    v.line.repaint();
+                }
+            }
+        }
         System.out.println("Максимальный поток:" + flow);
     }
 }

@@ -1,5 +1,7 @@
 package Graphics;
 
+import Data.DataMapper;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -8,12 +10,14 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 public class Dot extends JComponent{
-    public int data;
     static boolean connection = false;
     static Dot root = null;
+
+
+    public int data;
     private volatile int draggedAtX, draggedAtY;
-    public ArrayList<Line> lines_root = new ArrayList<>();
-    public ArrayList<Line> lines_child = new ArrayList<>();
+    public ArrayList<Edge> edges_root = new ArrayList<>();
+    public ArrayList<Edge> edges_child = new ArrayList<>();
 
     Color color = Color.GREEN;
     public CustomListenet listenet = new CustomListenet();
@@ -22,17 +26,16 @@ public class Dot extends JComponent{
         this.data = data;
         addMouseMotionListener(new MouseMotionAdapter(){
             public void mouseDragged(MouseEvent e){
-                for (int i = 0; i < lines_child.size(); i++) {
-                    Line line = lines_child.get(i);
-                    line.x1 = e.getX() - draggedAtX + getLocation().x + 20;
-                    line.y1 = e.getY() - draggedAtY + getLocation().y + 20;
-                    lines_child.get(i).repaint();
+                for (int i = 0; i < edges_child.size(); i++) {
+                    Edge edge = edges_child.get(i);
+                    edge.getLine().x1 = e.getX() - draggedAtX + getLocation().x + 20;
+                    edge.getLine().y1 = e.getY() - draggedAtY + getLocation().y + 20;
+                    edges_child.get(i).getLine().repaint();
                 }
-                for (int i = 0; i < lines_root.size(); i++) {
-                    Line line = lines_root.get(i);
-                    line.x = e.getX() - draggedAtX + getLocation().x + 20;
-                    line.y = e.getY() - draggedAtY + getLocation().y + 20;
-                    lines_root.get(i).repaint();
+                for (Edge v: edges_root) {
+                    v.getLine().x = e.getX() - draggedAtX + getLocation().x + 20;
+                    v.getLine().y = e.getY() - draggedAtY + getLocation().y + 20;
+                    v.getLine().repaint();
                 }
                 setLocation(e.getX() - draggedAtX + getLocation().x,
                         e.getY() - draggedAtY + getLocation().y);;
@@ -73,7 +76,7 @@ public class Dot extends JComponent{
                     }
                 } else {
                     Dot child = (Dot) e.getSource();
-                    if (child != root && root != null && !Edge.is_connected(root, child)) {
+                    if (child != root && root != null && !DataMapper.is_connected(root, child)) {
                         int weight;
                         String inp = JOptionPane.showInputDialog("Введите вес линии");
                         if (inp == "") {
@@ -81,23 +84,12 @@ public class Dot extends JComponent{
                         } else {
                             weight = Integer.parseInt(inp);
                         }
-                        Line line = new Line(root, child, weight);
-                        new Edge(root, child, line, weight);
-                        child.lines_child.add(line);
-                        root.lines_root.add(line);
-                        MainPanel.MainFrame.add(line);
-                        line.setBounds(0, 0, 600, 600);
-                    /*
-                    if(MainPanel.neograph){
-                        line = new Line(child,root,weight);
-                        new Edge(child,root,line,weight);
-                        child.lines_child.add(line);
-                        root.lines_root.add(line);
-                        MainPanel.MainFrame.add(line);
-                        line.setBounds(0,0,600,600);
-                    }
-                     */
-                        MainPanel.MainFrame.repaint();
+                        Edge edge = new Edge(root, child, weight);
+                        child.edges_child.add(edge);
+                        root.edges_root.add(edge);
+                        GraphPanel.MainFrame.add(edge.getLine());
+                        edge.getLine().setBounds(0, 0, 600, 600);
+                        GraphPanel.MainFrame.repaint();
                     }
                     root.color = Color.green;
                     root.repaint();
@@ -108,13 +100,11 @@ public class Dot extends JComponent{
             }
             if(e.getButton() == MouseEvent.BUTTON3){
                 Dot dot = (Dot)e.getSource();
-                for(int i = 0; i < dot.lines_child.size();i++){
-                    MainPanel.MainFrame.remove(dot.lines_child.get(i));
-                    Edge.get_edges_from_line(dot.lines_child.get(i));
-                    dot.lines_child.remove(i);
+                for(Edge edge: dot.edges_child){
+                    GraphPanel.MainFrame.remove(edge.getLine());
                 }
-                repaint();
-                MainPanel.MainFrame.repaint();
+                DataMapper.edges.removeIf(edge -> edge.child == dot);
+                GraphPanel.MainFrame.repaint();
             }
         }
 

@@ -1,47 +1,93 @@
 package Graphics;
+import Data.DataMapper;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Edge{
-    public static ArrayList<Edge> edges = new ArrayList<Edge>();
     public Dot root;
     public Dot child;
     public Line line;
     public int weight;
 
-    public static Edge get_edges_from_line(Line line){
-        for(int i = 0; i < edges.size();i++){
-            if(edges.get(i).line == line){
-                edges.remove(i);
-                return edges.get(i);
-            }
-        }
-        return null;
-    }
-    Edge(Dot root, Dot child, Line line, int weight){
+    Edge(Dot root, Dot child, int weight){
         this.root = root;
         this.child = child;
         this.weight = weight;
-        this.line = line;
-        edges.add(this);
+        this.line = new Line();
+        DataMapper.add_edges(this);
     }
 
-    public static ArrayList<Dot> get_edges(Dot root){
-        ArrayList<Dot> return_edges = new ArrayList<Dot>();
-        for(int i = 0; i < edges.size();i++){
-            if (edges.get(i).root == root){
-                return_edges.add(edges.get(i).child);
-            }
-        }
-        return return_edges;
+    public Edge(Dot root, Dot child, double weight){
+        this.root = root;
+        this.child = child;
+        this.weight = (int)weight;
+        this.line = new Line();
+        DataMapper.add_edges(this);
     }
 
-    public static boolean is_connected(Dot root, Dot child){
-        for(int i = 0; i < edges.size();i++){
-            if(edges.get(i).root == root && edges.get(i).child == child){
-                return true;
-            }
+    public Edge(Dot root, Dot child, String text){
+        this.root = root;
+        this.child = child;
+        this.weight = Integer.MAX_VALUE;
+        this.line = new Line();
+        DataMapper.add_edges(this);
+        line.setText(text);
+    }
+
+
+    public Line getLine() {
+        return line;
+    }
+
+    //Отрисока Линии
+    public class Line extends JComponent { ;
+        public int x;
+        public int y;
+        public int x1;
+        public int y1;
+        String text_weight;
+        Color color = Color.black;
+
+        public void setColor(Color color){
+            this.color = color;
         }
-        return false;
+
+        private Line(){
+            x = root.getX()+20;
+            y = root.getY()+20;
+            x1 = child.getX()+20;
+            y1 = child.getY()+20;
+            this.text_weight = Integer.toString(weight);
+        }
+
+        public void setText(String text){
+            this.text_weight = text;
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.setColor(color);
+            Graphics2D g2 = (Graphics2D) g;
+            if(!GraphPanel.neograph) {
+                double ang = Math.atan2(y1 - y, x1 - x);
+                double tempc = Math.cos(ang);
+                double temps = Math.sin(ang);
+                int tempx1 = (int) (x1 - tempc * 23);
+                int tempy1 = (int) (y1 - temps * 23);
+                g.fillOval(tempx1 - 4, (tempy1 - 4), 10, 10);
+            }
+            else {
+                g2.setStroke(new BasicStroke(3));
+            }
+            g.drawLine(x, y, x1, y1);
+            g.setColor(Color.red);
+            g2.setFont(new Font( "M", Font.PLAIN, 18 ));
+            g.drawString(text_weight,(x+x1)/2,(y+y1)/2);
+            doLayout();
+        }
+
     }
 }

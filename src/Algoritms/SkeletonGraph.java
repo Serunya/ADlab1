@@ -2,18 +2,18 @@ package Algoritms;
 
 import java.awt.*;
 import java.util.ArrayList;
+
+import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
-import Graphics.Line;
 
-public class SkeletonGraph implements Runnable {
+public class SkeletonGraph extends Algoritm {
     ArrayList<Dot> dots = new ArrayList<>();
     ArrayList<Edge> edges = new ArrayList<>();
     ArrayList<Edge> skeletone_edges = new ArrayList<Edge>();
 
-    public SkeletonGraph(ArrayList<Dot> dots, ArrayList<Edge> edges){
-        this.dots.addAll(dots);
-        this.edges.addAll(edges);
+    public SkeletonGraph(){
+        super("Остов Графа");
     }
     public void out(){
         for(int i = 0; i < edges.size();i++){
@@ -55,8 +55,10 @@ public class SkeletonGraph implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void algoritm() {
         try {
+            this.dots = DataMapper.getDots();
+            this.edges = DataMapper.getEdges();
             Dot temp = dots.get(0);
             dots.remove(temp);
             ArrayList<Dot> skeleton = new ArrayList<>();

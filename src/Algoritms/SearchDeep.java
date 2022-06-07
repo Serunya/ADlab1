@@ -1,13 +1,13 @@
 package Algoritms;
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+
+import Data.DataMapper.*;
+import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
 
-public class SearchDeep implements Runnable {
-    ArrayList<Dot> dots;
-    ArrayList<Edge> edges;
+public class SearchDeep extends Algoritm {
     int search_item;
 
     public void all_green(ArrayList<Dot> dots){
@@ -16,11 +16,8 @@ public class SearchDeep implements Runnable {
         }
     }
 
-    public SearchDeep(ArrayList<Dot> dots, ArrayList<Edge> edges, int search_item) {
-        this.search_item = search_item;
-        this.dots = dots;
-        this.edges = edges;
-        all_green(dots);
+    public SearchDeep() {
+        super("Поиск в глубину 1");
     }
 
     public ArrayList<Dot> get_all_child(Dot root) {
@@ -57,8 +54,10 @@ public class SearchDeep implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void algoritm() {
         try {
+            this.search_item = dots.size();
+            all_green(dots);
             int steps = 0;
             /// Вершины
             Dot head = dots.get(0);
