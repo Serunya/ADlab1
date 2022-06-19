@@ -9,7 +9,28 @@ import java.util.ArrayList;
 public class DataMapper {
     public static ArrayList<Dot> dots = new ArrayList<>();
     public static ArrayList<Edge> edges = new ArrayList<>();
-    public static ArrayList<Algoritm> algoritms = new ArrayList<>();
+    private static final ArrayList<Algoritm> algoritms = new ArrayList<>();
+    public static ArrayList<Algoritm> get_algoritms(){
+        return algoritms;
+    }
+
+    public static ArrayList<Dot> get_child_dot(Dot temp){
+        ArrayList<Dot> child = new ArrayList<>();
+        for(Edge edge:edges){
+            if(edge.root == temp)
+                child.add(edge.child);
+        }
+        return child;
+    }
+    public static boolean add_algoritm(Algoritm algoritm){
+        for(Algoritm i: algoritms){
+            if(i.getClass() == algoritm.getClass()){
+                return false;
+            }
+        }
+        algoritms.add(algoritm);
+        return true;
+    }
 
 
     public static boolean add_edges(Edge edge){
@@ -49,7 +70,7 @@ public class DataMapper {
 
     public static Edge get_edge(int i, int j){
         for(Edge v: edges){
-            if(v.root.data == i && v.child.data == j){
+            if((v.root.data == i && v.child.data == j)||(v.root.data == j && v.child.data == i)){
                 return v;
             }
         }
@@ -58,7 +79,7 @@ public class DataMapper {
 
     public static boolean is_connected(Dot root, Dot child){
         for(int i = 0; i < edges.size();i++){
-            if(edges.get(i).root == root && edges.get(i).child == child){
+            if((edges.get(i).root == root && edges.get(i).child == child) || (edges.get(i).child == root && edges.get(i).root == child)){
                 return true;
             }
         }

@@ -24,6 +24,14 @@ public class GraphPanel extends JPanel {
         setVisible(true);
     }
 
+    public static void default_view(){
+        for(Dot dot: DataMapper.getDots())
+            dot.setColor(Color.green);
+        for(Edge edge: DataMapper.getEdges())
+            edge.line.setColor(Color.BLACK);
+        MainFrame.repaint();
+    }
+
     private class CustomListener implements MouseListener{
         @Override
         public void mouseClicked(MouseEvent e) {

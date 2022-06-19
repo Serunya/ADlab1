@@ -64,6 +64,17 @@ public class FordBelman extends Algoritm {
         }
         //Заработало
         new visual_result(dist);
+        Algoritm.current_algoritm.end = true;
+    }
+
+    @Override
+    public void next_step() {
+
+    }
+
+    @Override
+    public void prev_step() {
+
     }
 
 
@@ -104,4 +115,3 @@ public class FordBelman extends Algoritm {
         }
     }
 }
-

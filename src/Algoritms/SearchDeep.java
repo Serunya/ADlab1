@@ -1,23 +1,23 @@
 package Algoritms;
+
 import java.awt.*;
 import java.util.ArrayList;
 
 import Data.DataMapper.*;
 import Data.DataMapper;
-import Graphics.Dot;
-import Graphics.Edge;
+import Graphics.*;
 
 public class SearchDeep extends Algoritm {
     int search_item;
 
-    public void all_green(ArrayList<Dot> dots){
-        for(int i = 0; i < dots.size(); i++){
+    public void all_green(ArrayList<Dot> dots) {
+        for (int i = 0; i < dots.size(); i++) {
             dots.get(i).setColor(Color.green);
         }
     }
 
     public SearchDeep() {
-        super("Поиск в глубину 1");
+        super("Поиск в глубину");
     }
 
     public ArrayList<Dot> get_all_child(Dot root) {
@@ -27,13 +27,16 @@ public class SearchDeep extends Algoritm {
             if (edge.root == root) {
                 all_child.add(edge.child);
             }
+            if(edge.child == root){
+                all_child.add(edge.root);
+            }
         }
         return all_child;
     }
 
-    public Boolean isConnected(Dot root, Dot child){
-        for(int i = 0;i < edges.size();i++){
-            if(edges.get(i).root == root & edges.get(i).child == child){
+    public Boolean isConnected(Dot root, Dot child) {
+        for (int i = 0; i < edges.size(); i++) {
+            if ((edges.get(i).root == root && edges.get(i).child == child) || (edges.get(i).root == child && edges.get(i).child == root)) {
                 return true;
             }
         }
@@ -42,89 +45,94 @@ public class SearchDeep extends Algoritm {
 
     public Dot not_cheked_child(Dot root, ArrayList<Dot> cheked_dots) {
         ArrayList<Dot> childs = get_all_child(root);
-        if(cheked_dots.size() == 0 && childs.size() != 0){
+        if (cheked_dots.size() == 0 && childs.size() != 0) {
             return childs.get(0);
         }
-        for(int i = 0;i < childs.size();i++){
-            if(!cheked_dots.contains(childs.get(i))){
+        for (int i = 0; i < childs.size(); i++) {
+            if (!cheked_dots.contains(childs.get(i))) {
                 return childs.get(i);
             }
         }
         return null;
     }
 
+
+    private boolean next = true;
+
     @Override
     public void algoritm() {
-        try {
-            this.search_item = dots.size();
-            all_green(dots);
-            int steps = 0;
-            /// Вершины
-            Dot head = dots.get(0);
-            Dot temp = dots.get(0);
-            /// Листы
-            ArrayList<Dot> cheked_dots = new ArrayList<>();
-            ArrayList<Dot> history = new ArrayList<>();
-            // list for dream
-            ArrayList<int[]> UT = new ArrayList<int[]>();
-            ArrayList<int[]> UB = new ArrayList<int[]>();
-            ArrayList<int[]> UF = new ArrayList<int[]>();
-            ArrayList<int[]> UC = new ArrayList<int[]>();
-
-            ///
-            cheked_dots.add(head);
-            ArrayList<Dot> childs;
-            /// Красота
-            temp.setColor(Color.blue);
-            Thread.sleep(500);
-            temp.setColor(Color.green);
-            /// Сам алгоритм
-            do {
-                history.add(temp);
-                Dot next_child = not_cheked_child(temp,cheked_dots);
-                //Против циклов
-                if(history.contains(next_child)){
-                    history.addAll(cheked_dots);
-                    next_child = not_cheked_child(temp,history);
-                    history.removeAll(cheked_dots);
-                }
-                // Проверка элемента на нахождение
-                if(temp.data == search_item){
-                    temp.setColor(Color.magenta);
-                    break;
-                }
-                // Если все элементы проверенны
-                if(temp == head && next_child == null){
-                    steps = -1;
-                    break;
-                }
-                // Возвращение назад
-                if(next_child == null){
-                    if(isConnected(temp,history.get(history.size()-2))){
-                        temp.setColor(Color.pink);
-                        temp = history.get(history.size()-2);
-                        steps -= 2;
-                    }
-                    else {
-                        cheked_dots.add(temp);
-                        temp.setColor(Color.pink);
-                        temp = head;
-                        steps = 0;
-                        history.clear();
-                    }
-                }
-                else{
-                    UT.add(new int[]{temp.data,next_child.data});
-                    temp = next_child;
-                }
-                temp.setColor(Color.blue);
-                Thread.sleep(500);
-                temp.setColor(Color.green);
-                steps += 1;
-            } while (true);
-            System.out.println("Количество шагов: " + steps);
-        } catch(InterruptedException e){
-            e.printStackTrace();
+        MainMenu.context.next_step_button.setVisible(true);
+        MainMenu.context.next_step_button.setBounds(625, 610, 150, 30);
+        this.search_item = dots.size();
+        all_green(dots);
+        int steps = 0;
+        /// Вершины
+        Dot head = dots.get(0);
+        Dot temp = dots.get(0);
+        /// Листы
+        ArrayList<Dot> cheked_dots = new ArrayList<>();
+        ArrayList<Dot> history = new ArrayList<>();
+        cheked_dots.add(head);
+        ArrayList<Dot> childs;
+        /// Красота
+        temp.setColor(Color.blue);
+        while (next) {
+            Thread.yield();
         }
+        next = true;
+        /// Сам алгоритм
+        do {
+            temp.setColor(Color.green);
+            history.add(temp);
+            Dot next_child = not_cheked_child(temp, cheked_dots);
+            // Проверка элемента на нахождение
+            if (temp.data == search_item) {
+                temp.setColor(Color.magenta);
+                break;
+            }
+            // Если все элементы проверенны
+            if (temp == head && next_child == null) {
+                steps = -1;
+                break;
+            }
+            if (history.contains(next_child)) {
+                history.addAll(cheked_dots);
+                next_child = not_cheked_child(temp,history);
+                history.removeAll(cheked_dots);
+                if(next_child == null) {
+                    next_child = not_cheked_child(temp, cheked_dots);
+                    cheked_dots.add(temp);
+                    temp.setColor(Color.pink);
+                }
+            }
+            // Возвращение назад
+            if (next_child == null) {
+                cheked_dots.add(temp);
+                temp.setColor(Color.pink);
+                temp = head;
+                history.clear();
+            } else {
+                temp = next_child;
+            }
+            temp.setColor(Color.blue);
+            while (next) {
+                Thread.yield();
+            }
+            next = true;
+        } while (true);
+        MainMenu.context.next_step_button.setVisible(false);
+        System.out.println("Количество шагов: " + steps);
+        MainMenu.context.next_step_button.setBounds(705, 610, 70, 30);
+        Algoritm.current_algoritm.end = true;
+    }
+
+    @Override
+    public void next_step() {
+        next = false;
+    }
+
+    @Override
+    public void prev_step() {
+
     }
 }

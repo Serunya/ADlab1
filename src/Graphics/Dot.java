@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public class Dot extends JComponent{
@@ -78,11 +79,11 @@ public class Dot extends JComponent{
                     Dot child = (Dot) e.getSource();
                     if (child != root && root != null && !DataMapper.is_connected(root, child)) {
                         int weight;
-                        String inp = JOptionPane.showInputDialog("Введите вес линии");
-                        if (inp == "") {
-                            weight = 1;
-                        } else {
+                        try {
+                            String inp = JOptionPane.showInputDialog("Введите вес линии");
                             weight = Integer.parseInt(inp);
+                        }catch (NumberFormatException s){
+                            weight = 1;
                         }
                         Edge edge = new Edge(root, child, weight);
                         child.edges_child.add(edge);

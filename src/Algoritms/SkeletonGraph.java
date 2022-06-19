@@ -1,48 +1,87 @@
 package Algoritms;
 
+import Graphics.*;
+
 import java.awt.*;
 import java.util.ArrayList;
 
-import Data.DataMapper;
-import Graphics.Dot;
-import Graphics.Edge;
-
 public class SkeletonGraph extends Algoritm {
-    ArrayList<Dot> dots = new ArrayList<>();
-    ArrayList<Edge> edges = new ArrayList<>();
-    ArrayList<Edge> skeletone_edges = new ArrayList<Edge>();
+    public SkeletonGraph() {
+        super("Остов графа");
+    }
 
-    public SkeletonGraph(){
-        super("Остов Графа");
+    private ArrayList<Dot> visited = new ArrayList<>();
+    private ArrayList<Edge> skeleton_edges = new ArrayList<>();
+    private int count_dots;
+    private Dot temp;
+
+    @Override
+    protected void algoritm() {
+        visited.clear();
+        skeleton_edges.clear();
+        count_dots = dots.size();
+        temp = dots.get(0);
+        temp.setColor(Color.MAGENTA);
+        visited.add(temp);
+        dots.remove(temp);
     }
-    public void out(){
-        for(int i = 0; i < edges.size();i++){
-            System.out.print("Родитель: ");
-            System.out.println(edges.get(i).root);
-            System.out.print("Ребенок: ");
-            System.out.println(edges.get(i).child);
-        }
+
+    @Override
+    public void next_step() {
+        temp = get_min_edge(visited);
+        assert temp != null;
+        temp.setColor(Color.MAGENTA);
+        visited.add(temp);
+        dots.remove(temp);
+        show_interace_button();
     }
-    public Dot get_min_edge(ArrayList<Dot> roots){
+
+    @Override
+    public void prev_step() {
+        dots.add(visited.get(visited.size()-1));
+        dots.get(dots.size()-1).setColor(Color.green);
+        edges.add(skeleton_edges.get(skeleton_edges.size()-1));
+        edges.get(edges.size()-1).line.setColor(Color.BLACK);
+        visited.remove(visited.size()-1);
+        skeleton_edges.remove(skeleton_edges.size()-1);
+        show_interace_button();
+    }
+
+    public void show_interace_button(){
+        GraphPanel.MainFrame.repaint();
+        if (!dots.isEmpty())
+            MainMenu.context.next_step_button.setVisible(true);
+        else
+            MainMenu.context.next_step_button.setVisible(false);
+        if (visited.size() < 2)
+            MainMenu.context.prev_step_button.setVisible(false);
+        else
+            MainMenu.context.prev_step_button.setVisible(true);
+        MainMenu.context.repaint();
+    }
+
+    private Dot get_min_edge(ArrayList<Dot> roots) {
         int min_weight = 10000;
         Edge min_edge = null;
-        for(int i = 0;i < roots.size();i++){
-            for(int j = 0;j < edges.size();j++){
-                if(edges.get(j).root == roots.get(i) && !roots.contains(edges.get(j).child)){
-                    if(edges.get(j).weight < min_weight){
+        for (int i = 0; i < roots.size(); i++) {
+            for (int j = 0; j < edges.size(); j++) {
+                if (edges.get(j).root == roots.get(i) && !roots.contains(edges.get(j).child)) {
+                    if (edges.get(j).weight < min_weight) {
                         min_weight = edges.get(j).weight;
                         min_edge = edges.get(j);
                     }
                 }
-                if(edges.get(j).child == roots.get(i) && !roots.contains(edges.get(j).root)){
-                    if(edges.get(j).weight < min_weight){
+                if (edges.get(j).child == roots.get(i) && !roots.contains(edges.get(j).root)) {
+                    if (edges.get(j).weight < min_weight) {
                         min_weight = edges.get(j).weight;
                         min_edge = edges.get(j);
                     }
                 }
             }
         }
-        skeletone_edges.add(min_edge);
+        if(min_edge == null)
+            return null;
+        skeleton_edges.add(min_edge);
         edges.remove(min_edge);
         min_edge.line.setColor(Color.MAGENTA);
         min_edge.line.repaint();
@@ -51,39 +90,6 @@ public class SkeletonGraph extends Algoritm {
         }
         else {
             return min_edge.root;
-        }
-    }
-
-    @Override
-    public void algoritm() {
-        try {
-            this.dots = DataMapper.getDots();
-            this.edges = DataMapper.getEdges();
-            Dot temp = dots.get(0);
-            dots.remove(temp);
-            ArrayList<Dot> skeleton = new ArrayList<>();
-            while (dots.size() > 0){
-                Thread.sleep(1000);
-                temp.setColor(Color.MAGENTA);
-                skeleton.add(temp);
-                temp = get_min_edge(skeleton);
-                dots.remove(temp);
-            }
-            Thread.sleep(1000);
-            temp.setColor(Color.MAGENTA);
-            /// Просмотр результата
-            for(int i = 0; i < edges.size();i++){
-                edges.get(i).line.setVisible(false);
-            }
-            Thread.sleep(20000);
-            for(int i = 0; i < edges.size();i++){
-                edges.get(i).line.setVisible(true);
-            }
-            for(int i = 0; i < skeletone_edges.size();i++){
-                skeletone_edges.get(i).line.setColor(Color.black);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

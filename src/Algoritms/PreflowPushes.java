@@ -3,27 +3,26 @@ package Algoritms;
 import Data.DataMapper;
 import Graphics.Dot;
 import Graphics.Edge;
+import Graphics.MainMenu;
 
 import java.util.ArrayList;
 
 import static java.lang.Math.min;
 
 public class PreflowPushes extends Algoritm{
-    ArrayList<Dot> dots;
-    ArrayList<Edge> edges;
     int[] h;
     int[][] f;
     int[] e;
     final int INF = Integer.MAX_VALUE;
 
-
+    private boolean next = true;
     public PreflowPushes(){
         super("Проталкивание предпотока");
     }
 
     public int c(int a,int b){
         for(int i = 0; i < edges.size();i++){
-            if(edges.get(i).root.data == a && edges.get(i).child.data == b){
+            if((edges.get(i).root.data == a && edges.get(i).child.data == b) || (edges.get(i).root.data == b && edges.get(i).child.data == a)){
                 return edges.get(i).weight;
             }
         }
@@ -50,6 +49,7 @@ public class PreflowPushes extends Algoritm{
 
     @Override
     public void algoritm() {
+        MainMenu.context.next_step_button.setBounds(625,610,150,30);
         h = new int[dots.size()];
         for(int i = 0;i < dots.size();i++){
             h[i] = 0;
@@ -66,6 +66,11 @@ public class PreflowPushes extends Algoritm{
             e[i] = f[0][i];
         }
         for(;;){
+            while (next){
+                Thread.yield();
+            }
+            next = true;
+            output_flows();
             int i;
             for (i=1; i<n-1; i++)
                 if (e[i] > 0)
@@ -86,7 +91,12 @@ public class PreflowPushes extends Algoritm{
             if (c(0,i) != INF) {
                 flow += f[0][i];
             }
+        MainMenu.context.next_step_button.setBounds(705,610,70,30);
+        Algoritm.current_algoritm.end = true;
+        System.out.println("Максимальный поток:" + flow);
+    }
 
+    private void output_flows(){
         for(int i = 0; i < f.length; i++){
             System.out.println(i + ": ");
             for(int j = 0; j < f.length;j++){
@@ -98,6 +108,15 @@ public class PreflowPushes extends Algoritm{
                 }
             }
         }
-        System.out.println("Максимальный поток:" + flow);
+    }
+
+    @Override
+    public void next_step() {
+        next = false;
+    }
+
+    @Override
+    public void prev_step() {
+
     }
 }
