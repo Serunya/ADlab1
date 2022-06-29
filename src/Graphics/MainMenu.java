@@ -6,14 +6,14 @@ import Data.DataMapper;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainMenu extends JFrame {
     public static MainMenu context;
+    private File workFile;
     public ArrayList<JButton> buttons_algoritm = new ArrayList<>();
     public final JButton next_step_button = new JButton("=>");
     public final JButton prev_step_button = new JButton("<=");
@@ -50,6 +50,8 @@ public class MainMenu extends JFrame {
         });
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
+        MenuBar menu = new MenuBar();
+        setJMenuBar(menu);
         setSize(800,800);
         setLayout(null);
         setVisible(true);
@@ -58,23 +60,6 @@ public class MainMenu extends JFrame {
         main_panel.setBorder(blackline);
         main_panel.setBounds(10,10,610,610);
         add(main_panel);
-        JToggleButton toggleButton = new JToggleButton("ОрГраф");
-        ItemListener itemListener = itemEvent -> {
-            int state = itemEvent.getStateChange();
-            if (state == ItemEvent.SELECTED) {
-                toggleButton.setText("НеоГраф");
-                GraphPanel.neograph = false;
-                repaint();
-            }
-            else {
-                toggleButton.setText("ОрГраф");
-                GraphPanel.neograph = true;
-                repaint();
-            }
-        };
-        toggleButton.addItemListener(itemListener);
-        toggleButton.setBounds(625,570,150,30);
-        add(toggleButton);
         int i = 0;
         for(Algoritm a: DataMapper.get_algoritms()){
             JButton button_algoritm = new JButton((a.getName()));
@@ -106,4 +91,30 @@ public class MainMenu extends JFrame {
             button.setVisible(true);
         }
     }
+
+
+    /*
+    private void addFileButton(){
+        //Работа с файлами файла
+        JButton file_button = new JButton();
+        add(file_button);
+        file_button.setBounds(0,0,100,100);
+        file_button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setDialogTitle("Выбор файла");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                int resuslt = fileChooser.showOpenDialog(MainMenu.this);
+                if(resuslt == JFileChooser.APPROVE_OPTION){
+                    workFile = fileChooser.getSelectedFile();
+                }
+
+            }
+        });
+
+    }
+    */
 }
+
+

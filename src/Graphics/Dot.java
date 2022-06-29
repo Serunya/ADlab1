@@ -44,9 +44,10 @@ public class Dot extends JComponent{
         });
     }
 
-    public void setColor(Color color){
+    public Dot setColor(Color color){
         this.color = color;
         repaint();
+        return this;
     }
     @Override
     public void paint(Graphics g) {

@@ -7,6 +7,7 @@ import Graphics.GraphPanel;
 import Graphics.MainMenu;
 
 import javax.swing.*;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -37,7 +38,11 @@ public abstract class Algoritm implements Runnable{
         MainMenu.context.next_step_button.setVisible(true);
         MainMenu.context.end_algoritm_button.setVisible(true);
         MainMenu.context.repaint();
-        algoritm();
+        try {
+            algoritm();
+        } catch (IndexOutOfBoundsException e){
+            JOptionPane.showMessageDialog(MainMenu.context,"Вы не ввели граф","Не введен гарф",JOptionPane.ERROR_MESSAGE);
+        }
         while (!end)
             Thread.yield();
         end = false;

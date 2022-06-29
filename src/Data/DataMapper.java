@@ -15,12 +15,18 @@ public class DataMapper {
     }
 
     public static ArrayList<Dot> get_child_dot(Dot temp){
-        ArrayList<Dot> child = new ArrayList<>();
+        ArrayList<Dot> childs = new ArrayList<>();
         for(Edge edge:edges){
+            Dot child = null;
             if(edge.root == temp)
-                child.add(edge.child);
+                child = edge.child;
+            if(edge.child == temp)
+                child = edge.root;
+            if(!childs.contains(child) && child != null)
+                childs.add(child);
+
         }
-        return child;
+        return childs;
     }
     public static boolean add_algoritm(Algoritm algoritm){
         for(Algoritm i: algoritms){

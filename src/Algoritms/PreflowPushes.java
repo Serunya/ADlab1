@@ -5,6 +5,7 @@ import Graphics.Dot;
 import Graphics.Edge;
 import Graphics.MainMenu;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 import static java.lang.Math.min;
@@ -83,8 +84,10 @@ public class PreflowPushes extends Algoritm{
                     break;
             if (j < n)
                 push (i, j);
-            else
-                lift (i);
+            else {
+                lift(i);
+                next = false;
+            }
         }
         int flow = 0;
         for (int i=0; i<n; i++)
@@ -93,6 +96,7 @@ public class PreflowPushes extends Algoritm{
             }
         MainMenu.context.next_step_button.setBounds(705,610,70,30);
         Algoritm.current_algoritm.end = true;
+        JOptionPane.showMessageDialog(MainMenu.context,"Максимальный поток: " + flow,"Максимальный поток",JOptionPane.INFORMATION_MESSAGE);
         System.out.println("Максимальный поток:" + flow);
     }
 

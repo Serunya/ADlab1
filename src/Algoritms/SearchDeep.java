@@ -3,8 +3,6 @@ package Algoritms;
 import java.awt.*;
 import java.util.ArrayList;
 
-import Data.DataMapper.*;
-import Data.DataMapper;
 import Graphics.*;
 
 public class SearchDeep extends Algoritm {
@@ -58,7 +56,15 @@ public class SearchDeep extends Algoritm {
 
 
     private boolean next = true;
-
+    private boolean have_dupliate(ArrayList<Dot> dots){
+        for(int i = 0; i < dots.size()-1; i++){
+            for(int j = i+1; j < dots.size();j++){
+                if(dots.get(i) == dots.get(j))
+                    return true;
+            }
+        }
+        return false;
+    }
     @Override
     public void algoritm() {
         MainMenu.context.next_step_button.setVisible(true);
@@ -121,7 +127,6 @@ public class SearchDeep extends Algoritm {
             next = true;
         } while (true);
         MainMenu.context.next_step_button.setVisible(false);
-        System.out.println("Количество шагов: " + steps);
         MainMenu.context.next_step_button.setBounds(705, 610, 70, 30);
         Algoritm.current_algoritm.end = true;
     }
